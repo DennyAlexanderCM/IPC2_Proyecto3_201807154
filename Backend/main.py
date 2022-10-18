@@ -1,37 +1,24 @@
 from flask import Flask, jsonify, request
 from functions import *
+from flask_cors import CORS
 
 app = Flask(__name__)
-@app.route("/consultar", methods=['GET'])
-def consultarDatos():
-    return jsonify({"Estado":"Realizado"})
-
-@app.route("/resivido", methods=['POST'])
-def recibido():
-    body = request.get_json()
-    print(body["Saludo"])
-    return jsonify({"Estado":"Realizado"})
+CORS(app)
 
 # RECIBE LAS CONFIGURACIONES DEL SISTEMA
 @app.route("/configuration", methods=['POST'])
-def loadSettings():
+def configuraciones():
     body = request.get_data()
     XMLSystemConfiguration(body)
-    return jsonify({"Estado":"Realizado"})
+    resultados = XMLSystemConfigurationCustomers(body)
+    return jsonify(resultados)
 
-
-
-
-#load data
-@app.route("/load", methods=['POST'])
-def loadData():
-    #nombre = request.json['nombre']
-    #OBTENEMOS LOS DATOS DEL REQUEST
-    content = (request.get_data())
-     # object = {"Mensaje":"Se hizo el POST correctamente"}
-
-
-
+# RECIBE LAS CONFIGURACIONES DEL SISTEMA
+@app.route("/consumos", methods=['POST'])
+def consumos():
+    body = request.get_data()
+    respuesta = XMLSystemConfigurationUse(body)
+    return jsonify(respuesta)
 
 
 #INICIAR LA APP
