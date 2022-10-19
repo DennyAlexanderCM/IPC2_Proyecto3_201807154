@@ -22,8 +22,7 @@ def consumos():
     respuesta = XMLSystemConfigurationUse(body)
     return jsonify(respuesta)
 
-# RECIBE LAS CONFIGURACIONES DEL SISTEMA
-@app.route("/consultar", methods=['POST'])
+@app.route("/consultar", methods=['GET'])
 def consultas():
     body = {}
     body["recursos"] = returnDataResourses()
@@ -32,10 +31,10 @@ def consultas():
     return jsonify(body)
 
 # ELIMINA LOS DATOS ALMACENADOS
-@app.route("/reestablecer", methods=['POST'])
+@app.route("/restablecer", methods=['POST'])
 def restablecer():
     resetData()
-    return jsonify({"mensaje":"Datos eliminados"})
+    return jsonify({"Mensaje":"Datos eliminados correctamente"})
 
 
 #INICIAR LA APP

@@ -171,7 +171,7 @@ def XMLSystemConfigurationClients(xml):
     f =  open("Datos/Clientes.xml", "w", encoding='utf-8')    
     f.write(xml)
     f.close()
-    datos = [{"Clientes":numero_clientes},{"Instancias":numero_instancias}]
+    datos = {"Clientes":numero_clientes, "Instancias":numero_instancias}
     return datos
 
 def XMLSystemConfigurationUse(xml):
@@ -209,7 +209,7 @@ def XMLSystemConfigurationUse(xml):
     f =  open("Datos/Consumos.xml", "w", encoding='utf-8')    
     f.write(xml)
     f.close()
-    respuesta = {"consumos":numero_consumos}
+    respuesta = {"Consumos":numero_consumos}
     return respuesta
 
 def extractDate(txt):

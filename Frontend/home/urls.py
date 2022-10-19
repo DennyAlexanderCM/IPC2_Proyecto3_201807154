@@ -6,5 +6,6 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('configuraciones/', views.loadSettings, name="configuraciones"),
     path('consumos/', views.loadSettingsMessages, name="consumos"),
-    path('datos/', views.datos, name="datos"),
+    path('datos/', views.viewData, name="datos"),
+    
 ]

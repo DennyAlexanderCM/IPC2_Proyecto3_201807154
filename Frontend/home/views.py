@@ -13,8 +13,7 @@ def loadSettings(request):
 def loadSettingsMessages(request):
     return render(request, "consumidos.html")
 
-def datos(request):
-    datos = Configuraciones.getEstado()
-    return HttpResponse("hello word"+ datos["Estado"])
+def viewData(request):
+    return render(request, "views.html")
 
 

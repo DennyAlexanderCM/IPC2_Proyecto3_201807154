@@ -1,0 +1,14 @@
+{% extends "layouts/base.html"%}
+
+{% block content %}
+{% load static %}
+<div class="content flex">
+    <div class="contenedor flex">
+            <h2>Cargar mensajes de consumo</h2>
+        <div class="input-group">
+            <input class="form-control" type="file" id="file-input">
+        </div>
+    </div>
+</div>
+<script src="{% static 'scriptCO.js' %}"></script>
+{% endblock %}
