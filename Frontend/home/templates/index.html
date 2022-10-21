@@ -1,9 +1,18 @@
 {% extends "layouts/base.html"%}
 
 {% block content %}
-<div class="content flex">
-    <div class="contenedor flex">
-            <h1>Es un gusto servirle</12>
+{% load static %}
+<div class="container p-3">
+    <div class="row justify-content-center">
+      <div class="col-6  m-5  ">
+        <div class="text-center">
+          <h1>¡Bienvenido!</h1>
+          <div class="m-4">
+            <img src="{% static 'img/desktop.svg' %}" class="rounded" alt="..." width="35%">
+          </div>
+          <h1>Es un gusto servirle</h1>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}

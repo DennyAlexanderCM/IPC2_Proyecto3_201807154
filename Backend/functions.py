@@ -1,9 +1,6 @@
+from datetime import datetime
 from xml.dom.minidom import *
 import re
-from Clases import *
-from Clases.cliente import Instancia
-from Clases.configuracion import Recurso_2
-from Clases.consumo import Consumo
 
 def XMLSystemConfiguration(xml):
     doc = parseString(xml)
@@ -197,12 +194,16 @@ def XMLSystemConfigurationUse(xml):
         elemento_consumo.setAttribute("idInstancia", id_configuracion)
 
         tiempo_consumido_config = bd.createElement("tiempo")
-        tiempo_consumido_config.appendChild(bd.createTextNode(tiempo_consumido.strip()))
+        tiempo_consumido_config.appendChild(bd.createTextNode(extractTime(tiempo_consumido)))
         elemento_consumo.appendChild(tiempo_consumido_config)
         fecha_hora_config = bd.createElement("fechaHora")
-        fecha_hora_config.appendChild(bd.createTextNode(fecha_hora))
+        fecha_hora_config.appendChild(bd.createTextNode(extractDateTime(fecha_hora)))
         elemento_consumo.appendChild(fecha_hora_config)
         recursos_configuraciones.appendChild(elemento_consumo)
+
+        estado_config = bd.createElement("estado")
+        estado_config.appendChild(bd.createTextNode("Pendiente"))
+        elemento_consumo.appendChild(estado_config)
         numero_consumos += 1
 
     xml = Node.toxml(bd)
@@ -226,109 +227,15 @@ def extractDateTime(txt):
     if obtenido:
         return obtenido[0]
     else:
-        return None
+        return "Ninguno"
 
-def refreshDataCategories():
-    categorias_lista = []
-    doc = parse('Datos/Configuraciones.xml')
-    # Elemento raíz del documento
-    rootNode = doc.documentElement
-    categorias = rootNode.getElementsByTagName("categoria")
-    
-    for categoria in categorias:
-        id_categoria = categoria.getAttribute("id")
-        nombre_categoria = categoria.getAttribute("nombre")
-        descripcion_categoria = categoria.getElementsByTagName("descripcion")[0].firstChild.data
-        carga_trabajo_categoria = categoria.getElementsByTagName("cargaTrabajo")[0].firstChild.data
-        categoria_objeto = Categoria(id_categoria, nombre_categoria, descripcion_categoria, carga_trabajo_categoria)
-        
-        configuraciones = categoria.getElementsByTagName("configuracion")
-        for configuracion in configuraciones:
-            id_configuracion = configuracion.getAttribute("id")
-            nombre_configuracion = configuracion.getAttribute("nombre")
-            descripcion_configuracion = configuracion.getElementsByTagName("descripcion")[0].firstChild.data
-            configuracion_objeto = Configuracion(id_configuracion, nombre_configuracion, descripcion_configuracion)
-            recursos_configuracion = configuracion.getElementsByTagName("recurso")
-            
-            for recurso in recursos_configuracion:
-                id = recurso.getAttribute("id")
-                cantidad_recurso = recurso.firstChild.data
-                configuracion_objeto.añadirRecurso(Recurso_2(id, cantidad_recurso))
-            categoria_objeto.añadirConfiguracion(configuracion_objeto)
-        categorias_lista.append(categoria_objeto)
-    
-    return categorias_lista
-
-def refreshDataResources():
-    recursos_lista = []
-    doc = parse('Datos/Configuraciones.xml')
-    # Elemento raíz del documento
-    rootNode = doc.documentElement
-    lista_recursos = rootNode.getElementsByTagName("recursos")[0]
-    recursos = lista_recursos.getElementsByTagName("recurso")
-
-    for recurso in recursos:
-        id_recurso = recurso.getAttribute("id")
-        nombre_recurso = recurso.getAttribute("nombre")
-        abreviatura_recurso = recurso.getElementsByTagName("abreviatura")[0].firstChild.data
-        metrica_recurso = recurso.getElementsByTagName("metrica")[0].firstChild.data
-        tipo_recurso = recurso.getElementsByTagName("tipo")[0].firstChild.data
-        Valor_hora_recurso = recurso.getElementsByTagName("valorXhora")[0].firstChild.data
-        recursos_lista.append(Recurso(id_recurso, nombre_recurso, abreviatura_recurso, metrica_recurso, tipo_recurso, Valor_hora_recurso))
-    
-    return recursos_lista
-
-def refreshDataResourcesClient():
-    cliente_lista = []
-    doc = parse('Datos/Clientes.xml')
-    # Elemento raíz del documento
-    rootNode = doc.documentElement
-    clientes = rootNode.getElementsByTagName("cliente")
-    for cliente in clientes:
-        nit_cliente = cliente.getAttribute("nit")
-        nombre_cliente = cliente.getAttribute("nombre")
-        usuario_cliente = cliente.getElementsByTagName("usuario")[0].firstChild.data
-        clave_cliente = cliente.getElementsByTagName("clave")[0].firstChild.data
-        direcion_cliente = cliente.getElementsByTagName("direccion")[0].firstChild.data
-        correo_electronico = cliente.getElementsByTagName("correoElectronico")[0].firstChild.data
-        cliente_objeto = Cliente(nit_cliente, nombre_cliente, usuario_cliente, clave_cliente,direcion_cliente, correo_electronico)
-        
-        listas_instancias_cliente = cliente.getElementsByTagName("instancia")
-
-        for instancia in listas_instancias_cliente:
-            id_instancia = instancia.getAttribute("id")
-            nombre_instacia = instancia.getAttribute("nombre")
-            id_configuracion_instancia = instancia.getElementsByTagName("idConfiguracion")[0].firstChild.data
-            estado_instancia_facturado = instancia.getElementsByTagName("estado")[0].firstChild.data
-            fecha_inicio_instancia = instancia.getElementsByTagName("fechaInicio")[0].firstChild.data
-            estado_instancia = instancia.getElementsByTagName("estado")[0].firstChild.data
-            instancia_objeto = Instancia(id_instancia, id_configuracion_instancia, nombre_instacia, fecha_inicio_instancia, estado_instancia)
-            if estado_instancia.strip() == "Cancelada":
-                fecha_fin_instancia = instancia.getElementsByTagName("fechaFinal")[0].firstChild.data
-                instancia_objeto.setFechaFinal(fecha_fin_instancia)
-            if not(estado_instancia_facturado == "pendiente"):
-                instancia_objeto.Facturar()
-                
-            cliente_objeto.añadirInstacncias(instancia_objeto)
-        cliente_lista.append(cliente_objeto)
-    return cliente_lista
-
-def refreshDataResourcesUse():
-    consumos_lista = []
-    doc = parse("Datos/Consumos.xml")
-    # Elemento raíz del documento
-    rootNode = doc.documentElement
-    lista_comsumos = rootNode.getElementsByTagName("consumo")
-
-    for consumo in lista_comsumos:
-        nit_cliente = consumo.getAttribute("nitCliente")
-        id_configuracion = consumo.getAttribute("idInstancia")
-        tiempo_consumido = consumo.getElementsByTagName("tiempo")[0].firstChild.data
-        print(tiempo_consumido )
-        fecha_hora = consumo.getElementsByTagName("fechaHora")[0].firstChild.data
-        consumos_lista.append(Consumo(nit_cliente, id_configuracion, tiempo_consumido, fecha_hora))
-
-    return consumos_lista
+def extractTime(txt):
+    searchDate = re.compile(r'([\d]+([.][\d]+)?)')
+    obtenido = searchDate.search(txt)
+    if obtenido:
+        return obtenido[0]
+    else:
+        return "0"
 
 def returnDataCategories():
     categorias_lista = []
@@ -356,7 +263,7 @@ def returnDataCategories():
                 cantidad_recurso = recurso.firstChild.data
                 recursos_lista.append({"id":id, "cantidadRecurso":cantidad_recurso})
             configuraciones_lista.append({"id":id_configuracion, "nombre":nombre_configuracion, "descripcion":descripcion_configuracion, "recursos":recursos_lista})
-        categorias_lista.append({"id":id_categoria, "nombre":nombre_categoria, "descripcion":descripcion_categoria, "carga":carga_trabajo_categoria, "configuraiones":configuraciones_lista})
+        categorias_lista.append({"id":id_categoria, "nombre":nombre_categoria, "descripcion":descripcion_categoria, "carga":carga_trabajo_categoria, "configuraciones":configuraciones_lista})
     
     return categorias_lista
 
@@ -410,6 +317,38 @@ def returnDataClients():
         cliente_lista.append({"nit":nit_cliente, "nombre":nombre_cliente, "usuario":usuario_cliente, "clave":clave_cliente, "direccion": direcion_cliente, "correo":correo_electronico, "instancias":lista_intancias}) 
     return cliente_lista
 
+def returnDates():
+    respuesta = []
+    bd = parse('Datos/Consumos.xml')
+    rootNode = bd.documentElement
+    consumos = rootNode.getElementsByTagName("consumo")
+    for consumo in consumos:
+
+        fecha_hora = consumo.getElementsByTagName("fechaHora")[0].firstChild.data
+        estado = consumo.getElementsByTagName("estado")[0].firstChild.data
+        if estado == "Pendiente":
+            respuesta.append(fecha_hora)
+
+    return formatDate(respuesta)
+
+def formatDate(tiempos:list):
+    format_data = "%d/%m/%Y %H:%M"
+    tiempo_2 = []
+    for date_time in tiempos:
+        date = datetime.strptime(date_time, format_data)
+        tiempo_2.append(date)
+    
+    fechas = []
+    tiempo_2.sort()
+    for fecha in tiempo_2:
+        print(fecha)
+        fechas.append({"Dia":fecha.strftime("%d"), "Mes":fecha.strftime("%m"), "Anio":fecha.strftime("%Y")})
+
+
+    return fechas
+
+
+
 def resetData():
     clientes = '<?xml version="1.0" ?><base_de_datos><clientes></clientes></base_de_datos>'
     configuraciones = '<?xml version="1.0"?><base_de_datos><recursos></recursos><categorias></categorias></base_de_datos>'
@@ -424,4 +363,52 @@ def resetData():
     f =  open("Datos/Configuraciones.xml", "w", encoding='utf-8')    
     f.write(configuraciones)
     f.close()
+
+def addNewResourse(id, nombre, abreviatura, metrica, tipo, valorXhora):
+    doc = parse('Datos/Configuraciones.xml')
+    # Elemento raíz del documento
+    rootNode = doc.documentElement
+    lista_recursos = rootNode.getElementsByTagName("recursos")[0]
+
+    elemento_recurso = doc.createElement("recurso")
+    elemento_recurso.setAttribute("id"  , id)
+    elemento_recurso.setAttribute("nombre"  , nombre)
+    abreviatura_config = doc.createElement("abreviatura")
+    abreviatura_config.appendChild(doc.createTextNode(abreviatura))
+    elemento_recurso.appendChild(abreviatura_config)
+    metrica_config = doc.createElement("metrica")
+    metrica_config.appendChild(doc.createTextNode(metrica))
+    elemento_recurso.appendChild(metrica_config)
+    tipo_config = doc.createElement("tipo")
+    tipo_config.appendChild(doc.createTextNode(tipo))
+    elemento_recurso.appendChild(tipo_config)
+    valor_hora_config = doc.createElement("valorXhora")
+    valor_hora_config.appendChild(doc.createTextNode(valorXhora.strip()))
+    elemento_recurso.appendChild(valor_hora_config)
+    lista_recursos.appendChild(elemento_recurso)
+
+    xml = Node.toxml(doc)
+    f =  open("Datos/Configuraciones.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+def facturar(fecha_1, fecha_2):
+    format_data = "%d/%m/%Y"
+    fecha_1 = datetime.strptime(fecha_1, format_data)
+    print(fecha_1)
+    fecha_2 = datetime.strptime(fecha_2, format_data)
+    print(fecha_2)
+    bd = parse('Datos/Consumos.xml')
+    rootNode = bd.documentElement
+    consumos = rootNode.getElementsByTagName("consumo")
+    for consumo in consumos:
+        fecha_hora = consumo.getElementsByTagName("fechaHora")[0].firstChild.data
+        estado = consumo.getElementsByTagName("estado")[0].firstChild.data
+        if estado == "Pendiente":
+            fecha_hora = datetime.strptime(extractDate(fecha_hora) , format_data)
+            if fecha_1 >= fecha_hora and fecha_2 <= fecha_hora:
+                print(fecha_hora)
+
+facturar("01/01/2019", "01/01/2020")
+            
 

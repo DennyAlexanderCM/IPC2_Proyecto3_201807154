@@ -22,19 +22,34 @@ def consumos():
     respuesta = XMLSystemConfigurationUse(body)
     return jsonify(respuesta)
 
-@app.route("/consultar", methods=['GET'])
+@app.route("/consultarDatos", methods=['GET'])
 def consultas():
     body = {}
-    body["recursos"] = returnDataResourses()
-    body["categorias"] = returnDataCategories()
-    body["clientes"] = returnDataClients()
+    body["Recursos"] = returnDataResourses()
+    body["Categorias"] = returnDataCategories()
+    body["Clientes"] = returnDataClients()
+    return jsonify(body)
+
+@app.route("/consultarFechas", methods=['GET'])
+def consultasFechas():
+    body = {}
+    body["Fechas"] = returnDates()
     return jsonify(body)
 
 # ELIMINA LOS DATOS ALMACENADOS
-@app.route("/restablecer", methods=['POST'])
+@app.route("/restablecer", methods=['GET'])
 def restablecer():
     resetData()
     return jsonify({"Mensaje":"Datos eliminados correctamente"})
+
+@app.route("/crearRecurso", methods=['POST'])
+def crarRecurso():
+    body = request.get_json()
+    print(body["id"], body["nombre"], body["abreviatura"], body["metrica"], body["tipo"], body["valorXhora"])
+    addNewResourse(body["id"], body["nombre"], body["abreviatura"], body["metrica"], body["tipo"], body["valorXhora"])
+    
+    return jsonify({"Mensaje":"Correcto"})
+
 
 
 #INICIAR LA APP

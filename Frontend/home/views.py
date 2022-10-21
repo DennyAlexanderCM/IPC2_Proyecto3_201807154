@@ -14,6 +14,18 @@ def loadSettingsMessages(request):
     return render(request, "consumidos.html")
 
 def viewData(request):
-    return render(request, "views.html")
+    resultado = Configuraciones.getEstado()
+    return render(request, "views.html", resultado)
+
+def viewDates(request):
+    resultado = Configuraciones.getFechas()
+    return render(request, "seleccionarRango.html", resultado)
+
+def viewDates(request):
+    resultado = Configuraciones.getFechas()
+    return render(request, "seleccionarRango.html", resultado)
+
+def viewProfile(request):
+    return render(request, "estudiante.html")
 
 

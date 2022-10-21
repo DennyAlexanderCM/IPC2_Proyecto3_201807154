@@ -1,0 +1,20 @@
+{% extends "layouts/base.html"%}
+
+{% block content %}
+{% load static %}
+<div class="container p-3">
+  <div class="row justify-content-center">
+    <div class="col-6  m-5  ">
+      <div class="text-center">
+        <h1>Datos del Desarrollador</h1>
+        <div class="text-center m-4">
+          <img src="{% static 'img/student.svg' %}" class="rounded" alt="..." width="30%">
+        </div>
+        <h3><b>Nombre:</b> Denny Alexander Chalí Miza</h3>
+        <h3><b>Carnet:</b> 201807154</h3><br>
+        <h5><b>Correo:</b> 2838484560404@ingenieria.usac.edu.gt</h5>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
