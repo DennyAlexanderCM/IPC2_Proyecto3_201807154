@@ -267,7 +267,7 @@ def returnDataCategories():
     
     return categorias_lista
 
-def returnDataResourses():
+def returnDataResources():
     recursos_lista = []
     doc = parse('Datos/Configuraciones.xml')
     # Elemento raíz del documento
@@ -347,8 +347,6 @@ def formatDate(tiempos:list):
 
     return fechas
 
-
-
 def resetData():
     clientes = '<?xml version="1.0" ?><base_de_datos><clientes></clientes></base_de_datos>'
     configuraciones = '<?xml version="1.0"?><base_de_datos><recursos></recursos><categorias></categorias></base_de_datos>'
@@ -392,6 +390,134 @@ def addNewResourse(id, nombre, abreviatura, metrica, tipo, valorXhora):
     f.write(xml)
     f.close()
 
+def addNewCategory(id, nombre, descripcion, cargaTrabajo):
+    doc = parse('Datos/Configuraciones.xml')
+    # Elemento raíz del documento
+    rootNode = doc.documentElement
+    lista_categorias = rootNode.getElementsByTagName("categorias")[0]
+
+    elemento_categoria = doc.createElement("categoria")
+    elemento_categoria .setAttribute("id", id)
+    elemento_categoria .setAttribute("nombre"  , nombre)
+    descripcion_config = doc.createElement("descripcion")
+    descripcion_config.appendChild(doc.createTextNode(descripcion))
+    elemento_categoria .appendChild(descripcion_config)
+    carga_trabajo = doc.createElement("cargaTrabajo")
+    carga_trabajo.appendChild(doc.createTextNode(cargaTrabajo))
+    elemento_categoria .appendChild(carga_trabajo)
+    lista_categorias.appendChild(elemento_categoria )
+
+    xml = Node.toxml(doc)
+    f =  open("Datos/Configuraciones.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+def addNewClient(nit_cliente,nombre_cliente, usuario_cliente, clave_cliente, direcion_cliente, correo_electronico ):
+    bd = parse('Datos/Clientes.xml')
+    rootNode = bd.documentElement
+    clientes_configuraciones = rootNode.getElementsByTagName('clientes')[0]
+
+         # ----------------------------------------------
+    elemento_cliente = bd.createElement("cliente")
+    elemento_cliente.setAttribute("nit", nit_cliente)
+    elemento_cliente.setAttribute("nombre", nombre_cliente)
+    usuario_config = bd.createElement("usuario")
+    usuario_config.appendChild(bd.createTextNode(usuario_cliente))
+    elemento_cliente.appendChild(usuario_config)
+    clave_config = bd.createElement("clave")
+    clave_config.appendChild(bd.createTextNode(clave_cliente))
+    elemento_cliente.appendChild(clave_config)
+    direccion_config = bd.createElement("direccion")
+    direccion_config.appendChild(bd.createTextNode(direcion_cliente))
+    elemento_cliente.appendChild(direccion_config)
+    correo_config = bd.createElement("correoElectronico")
+    correo_config.appendChild(bd.createTextNode(correo_electronico))
+    elemento_cliente.appendChild(correo_config)
+    clientes_configuraciones.appendChild(elemento_cliente)
+    xml = Node.toxml(bd)
+    f =  open("Datos/Clientes.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+def addNewInstanceClient(id_cliente, id_instancia, nombre_instancia, id_config, fechaInicio, estado, fechaFinal = None):
+    bd = parse('Datos/Clientes.xml')
+    rootNode = bd.documentElement
+    clientes = rootNode.getElementsByTagName("cliente")
+    for cliente in clientes:
+        if id_cliente == cliente.getAttribute("nit"):
+            instancias = cliente.getElementsByTagName("instancias")
+            elemento_instancia = bd.createElement("instancia")
+            elemento_instancia.setAttribute("id", id_instancia)
+            elemento_instancia.setAttribute("nombre", nombre_instancia)
+            elemento_instancia.setAttribute("estado", "pendiente")
+            id_configuracion = bd.createElement("idConfiguracion")
+            id_configuracion.appendChild(bd.createTextNode(id_config))
+            elemento_instancia.appendChild(id_configuracion)
+            fecha_inicio = bd.createElement("fechaInicio")
+            fecha_inicio.appendChild(bd.createTextNode(extractDate(fechaInicio)))
+            elemento_instancia.appendChild(fecha_inicio)
+            estado_instancia_config = bd.createElement("estado")
+            estado_instancia_config.appendChild(bd.createTextNode(estado))
+            elemento_instancia.appendChild(estado_instancia_config)
+            if estado.strip() == "Cancelada":
+                fecha_fin = bd.createElement("fechaFinal")
+                fecha_fin.appendChild(bd.createTextNode(extractDate(fechaFinal)))
+                elemento_instancia.appendChild(fecha_fin)
+            if not(instancias):
+                instancias = bd.createElement("instancias")
+                instancias.appendChild(elemento_instancia)
+                cliente.appendChild(instancias)
+            else:
+                instancias[0].appendChild(elemento_instancia)
+
+    xml = Node.toxml(bd)
+    f =  open("Datos/Clientes.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+
+def addNewConfiguration(id_categoria,id_configuracion, nombre_configuracion, descripcion):
+    bd = parse('Datos/Configuraciones.xml')
+    rootNode = bd.documentElement
+    categorias = rootNode.getElementsByTagName('categorias')[0]
+    categorias = categorias.getElementsByTagName("categoria")
+    for categoria in categorias:
+        if id_categoria == categoria.getAttribute("id"):
+            elemento_configuracion = bd.createElement("configuracion")
+            elemento_configuracion.setAttribute("id"  , id_configuracion)
+            elemento_configuracion.setAttribute("nombre"  , nombre_configuracion)
+            descripcion_cnfg = bd.createElement("descripcion")
+            descripcion_cnfg.appendChild(bd.createTextNode(descripcion))
+            elemento_configuracion.appendChild(descripcion_cnfg)
+            configuraciones = categoria.getElementsByTagName("configuraciones")
+            if not(configuraciones):
+                configuraciones = bd.createElement("configuraciones")
+                configuraciones.appendChild(elemento_configuracion)
+                categoria.appendChild(configuraciones)
+            else:
+                configuraciones[0].appendChild(elemento_configuracion)
+    xml = Node.toxml(bd)
+    f =  open("Datos/Configuraciones.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+def addNewResourseConfiguration(id_configuracion, id_recurso, Cantidad):
+    bd = parse('Datos/Configuraciones.xml')
+    rootNode = bd.documentElement
+    categorias = rootNode.getElementsByTagName('categorias')[0]
+    configuraciones = categorias.getElementsByTagName("configuraciones")
+    for configuracion in configuraciones:
+        if id_configuracion == configuracion.getAttribute("id"):
+            recurso = bd.createElement("recurso")
+            recurso.setAttribute("id", id_recurso)
+            recurso.appendChild(bd.createTextNode(Cantidad))
+            configuracion.appendChild(recurso)
+
+    xml = Node.toxml(bd)
+    f =  open("Datos/Configuraciones.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
 def facturar(fecha_1, fecha_2):
     format_data = "%d/%m/%Y"
     fecha_1 = datetime.strptime(fecha_1, format_data)
@@ -408,7 +534,4 @@ def facturar(fecha_1, fecha_2):
             fecha_hora = datetime.strptime(extractDate(fecha_hora) , format_data)
             if fecha_1 >= fecha_hora and fecha_2 <= fecha_hora:
                 print(fecha_hora)
-
-facturar("01/01/2019", "01/01/2020")
-            
 

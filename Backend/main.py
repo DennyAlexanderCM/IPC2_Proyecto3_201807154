@@ -25,7 +25,7 @@ def consumos():
 @app.route("/consultarDatos", methods=['GET'])
 def consultas():
     body = {}
-    body["Recursos"] = returnDataResourses()
+    body["Recursos"] = returnDataResources()
     body["Categorias"] = returnDataCategories()
     body["Clientes"] = returnDataClients()
     return jsonify(body)
@@ -42,16 +42,55 @@ def restablecer():
     resetData()
     return jsonify({"Mensaje":"Datos eliminados correctamente"})
 
+#correcto
 @app.route("/crearRecurso", methods=['POST'])
 def crarRecurso():
     body = request.get_json()
-    print(body["id"], body["nombre"], body["abreviatura"], body["metrica"], body["tipo"], body["valorXhora"])
     addNewResourse(body["id"], body["nombre"], body["abreviatura"], body["metrica"], body["tipo"], body["valorXhora"])
     
     return jsonify({"Mensaje":"Correcto"})
 
+#correcto
+@app.route("/crearCategoria", methods=['POST'])
+def crarCategoria():
+    body = request.get_json()
+    addNewCategory(body["id"], body["nombre"], body["descripcion"], body["carga"])
+    return jsonify({"Mensaje":"Correcto"})
 
+#correcto
+@app.route("/crearConfiguracion", methods=['POST'])
+def crarConfiguracion():
+    body = request.get_json()
+    print(body["id_categoria"])
+    addNewConfiguration(body["id_categoria"], body["id_config"], body["nombre"], body["descripcion"])
+    
+    return jsonify({"Mensaje":"Correcto"})
 
+#correcto
+@app.route("/crearCliente", methods=['POST'])
+def crarCliente():
+    body = request.get_json()
+    
+    addNewClient(body["nit"], body["nombre"], body["usuario"], body["clave"], body["direccion"], body["correo"])
+    return jsonify({"Mensaje":"Correcto"})
+
+@app.route("/crearInstancia", methods=['POST'])
+def crarInstancia():
+    body = request.get_json()
+    if body["estado"] == "Cancelada":
+        print(body["fechaInicio"])
+        addNewInstanceClient(body["nit"], body["id"], body["nombre"], body["idConfig"], body["fechaInicio"], body["estado"], body["fechaFin"])
+    else:
+        addNewInstanceClient(body["nit"], body["id"], body["nombre"], body["idConfig"], body["fechaInicio"], body["estado"])
+
+    return jsonify({"Mensaje":"Correcto"})
+
+@app.route("/crearRecursoConfiguracion", methods=['POST'])
+def crarRecursoConfiguracion():
+    body = request.get_json()
+    addNewResourseConfiguration(body["id_config"], body["id_recurso"], body["cantidad"])
+    
+    return jsonify({"Mensaje":"Correcto"})
 #INICIAR LA APP
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000, debug=True)
