@@ -1,7 +1,6 @@
-from cgitb import reset
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .services import Configuraciones
+from django.contrib import messages
 """
 def hello(request):
     return HttpResponse("Hello word")"""
@@ -42,7 +41,7 @@ def createCategory(request):
         trabajo = request.POST.get("work")
         informacion = {"id":id, "nombre": nombre, "descripcion":descripcion, "carga":trabajo}
         respuesta = Configuraciones.createNewCategories(informacion)
-        print(respuesta)
+        messages.add_message(request=request, level = messages.SUCCESS, message="Categoría Creada")
     return redirect("/crearelementos")
 
 def createResourse(request):
@@ -55,8 +54,8 @@ def createResourse(request):
         valor = request.POST.get("value")
         informacion = {"id":id, "nombre": nombre, "abreviatura":abreviatura, "metrica":metrica, "tipo":tipo, "valorXhora":valor}
         respuesta = Configuraciones.createNewSourse(informacion)
-        print(respuesta)
-    return render(request, "crearNuevos.html")
+        messages.add_message(request=request, level = messages.SUCCESS, message="Recurso Creado")
+    return redirect("/crearelementos")
 
 def createClient(request):
     if request.method == "POST":
@@ -68,8 +67,8 @@ def createClient(request):
         correo = request.POST.get("mail")
         informacion = {"nit":id, "nombre": nombre, "usuario":usuario, "clave":clave, "direccion":direccion, "correo":correo}
         respuesta = Configuraciones.createNewClient(informacion)
-        print(informacion)
-    return render(request, "crearNuevos.html")
+        messages.add_message(request=request, level = messages.SUCCESS, message="Cliente Añadido")
+    return redirect("/crearelementos")
 
 def createConfig(request):
     if request.method == "POST":
@@ -79,8 +78,8 @@ def createConfig(request):
         descripcion = request.POST.get("description")
         informacion = {"id_categoria":id_categoria, "id_config": id_config, "nombre":nombre, "descripcion":descripcion}
         respuesta = Configuraciones.createNewConfiguration(informacion)
-        print(informacion)
-    return render(request, "crearNuevos.html")
+        messages.add_message(request=request, level = messages.SUCCESS, message="Configuración añadida")
+    return redirect("/crearelementos")
 
 def createInstance(request):
     if request.method == "POST":
@@ -97,8 +96,8 @@ def createInstance(request):
         else:
             informacion = {"nit":nit_cliente, "id": id_instancia, "nombre":nombre, "fechaInicio":fecha_inicio, "estado":"Vigente", "idConfig":configuracion}
             respuesta = Configuraciones.createNewInstance(informacion)
-            print(informacion)
-    return render(request, "crearNuevos.html")
+        messages.add_message(request=request, level = messages.SUCCESS, message="Instancia Creada")
+    return redirect("/crearelementos")
 
 def cancelInstance(request):
     if request.method == "POST":
@@ -109,5 +108,5 @@ def cancelInstance(request):
             id_instancia = seleccion[1]
             informacion = {"nitCliente":nit_cliente, "idInstancia":id_instancia}
             respuesta = Configuraciones.cancelInstance(informacion)
-            print(informacion)
-    return render(request, "crearNuevos.html")
+            messages.add_message(request=request, level = messages.SUCCESS, message="Instancia Cancelada")
+    return redirect("/crearelementos")

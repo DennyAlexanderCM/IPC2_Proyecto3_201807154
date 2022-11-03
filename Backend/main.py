@@ -5,8 +5,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-configuraciones = []
-
 # RECIBE LAS CONFIGURACIONES DEL SISTEMA
 @app.route("/configuracion", methods=['POST'])
 def configuraciones():
@@ -42,7 +40,7 @@ def restablecer():
     resetData()
     return jsonify({"Mensaje":"Datos eliminados correctamente"})
 
-#correcto
+# CREAR RECURSO
 @app.route("/crearRecurso", methods=['POST'])
 def crarRecurso():
     body = request.get_json()
@@ -50,14 +48,14 @@ def crarRecurso():
     
     return jsonify({"Mensaje":"Correcto"})
 
-#correcto
+# CREAR CATEGORÍA
 @app.route("/crearCategoria", methods=['POST'])
 def crarCategoria():
     body = request.get_json()
     addNewCategory(body["id"], body["nombre"], body["descripcion"], body["carga"])
     return jsonify({"Mensaje":"Correcto"})
 
-#correcto
+# CREAR CONFIGURACIÓN
 @app.route("/crearConfiguracion", methods=['POST'])
 def crarConfiguracion():
     body = request.get_json()
@@ -66,7 +64,7 @@ def crarConfiguracion():
     
     return jsonify({"Mensaje":"Correcto"})
 
-#correcto
+# CREAR CLIENTE
 @app.route("/crearCliente", methods=['POST'])
 def crarCliente():
     body = request.get_json()
@@ -74,6 +72,7 @@ def crarCliente():
     addNewClient(body["nit"], body["nombre"], body["usuario"], body["clave"], body["direccion"], body["correo"])
     return jsonify({"Mensaje":"Correcto"})
 
+# CREAR iNSTANCIA
 @app.route("/crearInstancia", methods=['POST'])
 def crarInstancia():
     body = request.get_json()
@@ -85,12 +84,21 @@ def crarInstancia():
 
     return jsonify({"Mensaje":"Correcto"})
 
+# AÑADIR UN RECURSO A UNA CONFIGURACIÓN
 @app.route("/crearRecursoConfiguracion", methods=['POST'])
 def crarRecursoConfiguracion():
     body = request.get_json()
     addNewResourseConfiguration(body["id_config"], body["id_recurso"], body["cantidad"])
     
     return jsonify({"Mensaje":"Correcto"})
+
+# CANCELA LA INSTANCIA DE UN CLIENTE
+@app.route("/cancelarInstancia", methods=['POST'])
+def cancelarInstancia():
+    body = request.get_json()
+    cancelarInstancias(body["nitCliente"], body["idInstancia"])
+    return jsonify({"Mensaje":"Correcto"})
+
 #INICIAR LA APP
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000, debug=True)

@@ -194,7 +194,7 @@ def XMLSystemConfigurationUse(xml):
         elemento_consumo.setAttribute("idInstancia", id_configuracion)
 
         tiempo_consumido_config = bd.createElement("tiempo")
-        tiempo_consumido_config.appendChild(bd.createTextNode(extractTime(tiempo_consumido)))
+        tiempo_consumido_config.appendChild(bd.createTextNode(tiempo_consumido.strip()))
         elemento_consumo.appendChild(tiempo_consumido_config)
         fecha_hora_config = bd.createElement("fechaHora")
         fecha_hora_config.appendChild(bd.createTextNode(extractDateTime(fecha_hora)))
@@ -228,14 +228,6 @@ def extractDateTime(txt):
         return obtenido[0]
     else:
         return "Ninguno"
-
-def extractTime(txt):
-    searchDate = re.compile(r'([\d]+([.][\d]+)?)')
-    obtenido = searchDate.search(txt)
-    if obtenido:
-        return obtenido[0]
-    else:
-        return "0"
 
 def returnDataCategories():
     categorias_lista = []
@@ -454,14 +446,14 @@ def addNewInstanceClient(id_cliente, id_instancia, nombre_instancia, id_config, 
             id_configuracion.appendChild(bd.createTextNode(id_config))
             elemento_instancia.appendChild(id_configuracion)
             fecha_inicio = bd.createElement("fechaInicio")
-            fecha_inicio.appendChild(bd.createTextNode(extractDate(fechaInicio)))
+            fecha_inicio.appendChild(bd.createTextNode(formatDate(fechaInicio)))
             elemento_instancia.appendChild(fecha_inicio)
             estado_instancia_config = bd.createElement("estado")
             estado_instancia_config.appendChild(bd.createTextNode(estado))
             elemento_instancia.appendChild(estado_instancia_config)
             if estado.strip() == "Cancelada":
                 fecha_fin = bd.createElement("fechaFinal")
-                fecha_fin.appendChild(bd.createTextNode(extractDate(fechaFinal)))
+                fecha_fin.appendChild(bd.createTextNode(formatDate(fechaFinal)))
                 elemento_instancia.appendChild(fecha_fin)
             if not(instancias):
                 instancias = bd.createElement("instancias")
@@ -475,6 +467,10 @@ def addNewInstanceClient(id_cliente, id_instancia, nombre_instancia, id_config, 
     f.write(xml)
     f.close()
 
+def formatDate(fecha):
+    datos = fecha.split("-")
+    resultado = datos[2]+"/"+ datos[1]+"/"+datos[0]
+    return resultado
 
 def addNewConfiguration(id_categoria,id_configuracion, nombre_configuracion, descripcion):
     bd = parse('Datos/Configuraciones.xml')
@@ -518,20 +514,49 @@ def addNewResourseConfiguration(id_configuracion, id_recurso, Cantidad):
     f.write(xml)
     f.close()
 
-def facturar(fecha_1, fecha_2):
+def convertirFecha(fecha):
     format_data = "%d/%m/%Y"
-    fecha_1 = datetime.strptime(fecha_1, format_data)
-    print(fecha_1)
-    fecha_2 = datetime.strptime(fecha_2, format_data)
-    print(fecha_2)
-    bd = parse('Datos/Consumos.xml')
+    fecha = datetime.strptime(extractDate(fecha), format_data)
+    return fecha
+
+def verificarEstadoInsancia(nit, instanciaId):
+    pendiente = False
+    bd = parse('Datos/Clientes.xml')
     rootNode = bd.documentElement
-    consumos = rootNode.getElementsByTagName("consumo")
-    for consumo in consumos:
-        fecha_hora = consumo.getElementsByTagName("fechaHora")[0].firstChild.data
-        estado = consumo.getElementsByTagName("estado")[0].firstChild.data
-        if estado == "Pendiente":
-            fecha_hora = datetime.strptime(extractDate(fecha_hora) , format_data)
-            if fecha_1 >= fecha_hora and fecha_2 <= fecha_hora:
-                print(fecha_hora)
+    clientes = rootNode.getElementsByTagName('cliente')
+    for cliente in clientes:
+        nit_cliente = cliente.getAttribute("nit")
+        if nit_cliente == nit:
+            listas_instancias_cliente = cliente.getElementsByTagName("instancia")
+            for instancia in listas_instancias_cliente:
+                id_instancia = instancia.getAttribute("id")
+                if instanciaId == id_instancia:
+                    estado = instancia.getAttribute("estado")
+                    if estado == "pendiente":
+                        pendiente = True
+                        instancia.setAttribute("estado"  , "cancelado")
+    xml = Node.toxml(bd)
+    f =  open("Datos/Clientes.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+    return pendiente               
+
+def cancelarInstancias(nit_cliente, id_instancia):
+    bd = parse('Datos/Clientes.xml')
+    rootNode = bd.documentElement
+    clientes = rootNode.getElementsByTagName("cliente")
+    for cliente in clientes:
+        if nit_cliente == cliente.getAttribute("nit"):
+            instancias = cliente.getElementsByTagName("instancia")
+            for instancia in instancias:
+                if instancia.getAttribute("id") == id_instancia:
+                    instancia
+                    instancia.parentNode.removeChild(instancia)
+
+    xml = Node.toxml(bd)
+    f =  open("Datos/Clientes.xml", "w", encoding='utf-8')    
+    f.write(xml)
+    f.close()
+
+   
 

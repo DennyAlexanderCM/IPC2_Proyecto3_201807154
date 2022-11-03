@@ -3,6 +3,16 @@
 {% block content %}
 <div class="container p-3">
     <div class="row justify-content-center">
+        {% if messages %}
+        {% for message in messages %}
+        <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show col-10" {% endif %}
+            role="alert">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         <div class="col-10  m-5">
             <h3>Crear y agregar nuevos datos</h3>
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -34,36 +44,40 @@
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade  show active" id="pills-sourse" role="tabpanel"
                     aria-labelledby="pills-sourse-tab" tabindex="0">
-                    <form class="row g-3" method="POST" action="{% url 'crearRecurso' %}">
-                        {% csrf_token %}
-                        <div class="col-md-2">
-                            <label for="id" class="form-label">ID</label>
-                            <input type="text" class="form-control" id="id" name="id" required>
-                        </div>
-                        <div class="col-md-10">
-                            <label for="name" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="abbreviation" class="form-label">Abreviatura</label>
-                            <input type="text" class="form-control" id="abbreviation" name="abbreviation" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="metrics" class="form-label">Métrica</label>
-                            <input type="text" class="form-control" id="metrics" name="metrics" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="type" class="form-label">Tipo</label>
-                            <input type="text" class="form-control" id="type" name="type" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="value" class="form-label">Valor por hora</label>
-                            <input type="mumber" class="form-control" id="value" name="value" value="0" required>
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-primary" type="submit">Crear</button>
-                        </div>
-                    </form>
+                            <form class="row g-3" method="POST" action="{% url 'crearRecurso' %}">
+                                {% csrf_token %}
+                                <div class="col-md-2">
+                                    <label for="id" class="form-label">ID</label>
+                                    <input type="text" class="form-control" id="id" name="id" required>
+                                </div>
+                                <div class="col-md-10">
+                                    <label for="name" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="abbreviation" class="form-label">Abreviatura</label>
+                                    <input type="text" class="form-control" id="abbreviation" name="abbreviation" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="metrics" class="form-label">Métrica</label>
+                                    <input type="text" class="form-control" id="metrics" name="metrics" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="type" class="form-label">Tipo</label>
+                                    <select class="form-select" aria-label="Default select example" id="type" name="type"
+                                        required>
+                                        <option value="Hardware">Hardware</option>
+                                        <option value="Software">Software</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="value" class="form-label">Valor por hora</label>
+                                    <input type="mumber" class="form-control" id="value" name="value" value="0" required>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary" type="submit">Crear</button>
+                                </div>
+                            </form>
                 </div>
                 <div class="tab-pane fade" id="pills-categories" role="tabpanel" aria-labelledby="pills-categorie-tab"
                     tabindex="0">
@@ -167,7 +181,6 @@
                                 data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel"
                                 aria-selected="false">Cancelar</button>
                         </li>
-
                     </ul>
                     <div class="tab-content" id="sub-pills-tabContent">
                         <div class="tab-pane fade  show active" id="pills-new" role="tabpanel"
@@ -186,7 +199,8 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="id_instance" class="form-label">ID</label>
-                                    <input type="text" class="form-control" id="id_instance" name="id_instance" required>
+                                    <input type="text" class="form-control" id="id_instance" name="id_instance"
+                                        required>
                                 </div>
                                 <div class="col-md-8">
                                     <label for="name" class="form-label">Nombre</label>
@@ -234,7 +248,7 @@
                                 {% csrf_token %}
                                 <div class="col-md-7">
                                     <label for="id" class="form-label">Seleccionar instancia</label>
-                                    
+
                                     <select name="instancia" id="instancia">
                                         {%for Cliente in Clientes%}
                                         <optgroup label="{{Cliente.nombre}}">
@@ -245,14 +259,12 @@
                                         </optgroup>
                                         {%endfor%}
                                     </select>
-                                    
                                 </div>
                                 <div class="col-12">
                                     <button class="btn btn-primary" type="submit">Cancelar</button>
                                 </div>
                             </form>
                         </div>
-
                     </div>
                 </div>
             </div>
